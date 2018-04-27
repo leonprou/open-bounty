@@ -1,6 +1,8 @@
 import pytest
+from unittest import TestCase
 from pages.openbounty.bounties import BountiesPage
 from pages.openbounty.activity import ActivityPage
+from pages.thirdparty.github import get_contract_address
 from tests.basetestcase import BaseTestCase
 from tests import test_data
 
@@ -35,9 +37,9 @@ class TestLogin(BaseTestCase):
         activity_page.check_activity_is_presented('Submitted a claim for ', test_data.issue['title'])
 
 
-
-
-
-
-
-
+@pytest.mark.sanity
+class TestFunding(TestCase):
+    def test_implement_bounty_funding(self):
+        issue_link = 'https://github.com/NewOrGanizationSOB/RepoSOB1_2/issues/145'
+        address = get_contract_address(issue_link)
+        self.assertEqual(address, '0x5e2ae47063c55902b160738d6c4c217638df6da7')

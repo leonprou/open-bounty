@@ -1,4 +1,5 @@
-import time, pytest, git, os, shutil, logging
+import time, pytest, git, os, shutil, logging, requests
+from urllib.parse import urlsplit, urljoin
 from selenium.common.exceptions import TimeoutException
 from pages.base_element import BaseEditBox, BaseButton, BaseText
 from pages.base_page import BasePageObject
@@ -321,3 +322,22 @@ class GithubPage(BasePageObject):
         self.delete_repo.click()
         self.repo_name_confirm_delete.send_keys(test_data.config['ORG']['gh_repo_name'])
         self.confirm_delete.click()
+
+
+def get_contract_address(issue_link):
+    '''
+    returns the address of the bounty contract of the issue
+    '''
+    api_url = 'https://api.github.com/repos' + urlsplit(issue_link).path + '/comments'
+    comments = requests.get(api_url).json()
+
+    bounty_comment = next(comment for comment in comments
+        if comment['user']['login'] == 'status-open-bounty')
+    body = bounty_comment['body']
+
+    search_for = 'Contract address: ['
+    address_start_index = body.find(search_for) + len(search_for)
+
+    address = body[address_start_index:address_start_index+42]
+
+    return address
